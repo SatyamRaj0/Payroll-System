@@ -32,6 +32,7 @@ public class PayrollEngine {
     private final PayslipService payslipService;
 
     @Transactional
+    @SuppressWarnings("null")
     public Map<String, Object> processMonthlyPayroll(YearMonth period) {
         String periodStr = period.toString();
         log.info("[PAYROLL] Starting payroll for: {}", periodStr);

@@ -39,7 +39,7 @@ public class AuthController {
         }
         String token = authHeader.substring(7);
         try {
-            String username = authService.getJwtService().extractUsername(token);
+            authService.getJwtService().extractUsername(token);
             // Optionally, you can check if user exists
             return ResponseEntity.ok().build();
         } catch (Exception e) {

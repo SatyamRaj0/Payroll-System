@@ -7,7 +7,6 @@ import com.payroll.backend.employee.repository.EmployeeRepository;
 import com.payroll.backend.payroll.model.SalaryStructure;
 import com.payroll.backend.payroll.repository.SalaryStructureRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.*;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +24,7 @@ public class EmployeeService {
     }
 
     @Transactional
+    @SuppressWarnings("null")
     public Employee create(Employee employee) {
         Employee saved = employeeRepo.save(employee);
         
@@ -45,6 +45,7 @@ public class EmployeeService {
     }
 
     @Transactional
+    @SuppressWarnings("null")
     public Employee update(Long id, Employee updated) {
         Employee existing = employeeRepo.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Employee", id));
@@ -61,6 +62,7 @@ public class EmployeeService {
     }
 
     @Transactional
+    @SuppressWarnings("null")
     public void delete(Long id) {
         Employee emp = employeeRepo.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Employee", id));

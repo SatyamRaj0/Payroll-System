@@ -9,6 +9,7 @@ import java.time.Duration;
 public class RedisConfig {
 
     @Bean
+    @SuppressWarnings("null")
     public RedisCacheConfiguration cacheConfiguration() {
         return RedisCacheConfiguration.defaultCacheConfig()
             .entryTtl(Duration.ofMinutes(30))

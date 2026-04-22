@@ -30,6 +30,7 @@ public class PayslipService {
     private final PayrollEventProducer eventProducer;
 
     @Transactional
+    @SuppressWarnings("null")
     public byte[] generateAndStore(Long payrollRecordId) {
         PayrollRecord record = payrollRepo.findById(payrollRecordId)
             .orElseThrow(() -> new ResourceNotFoundException("PayrollRecord", payrollRecordId));

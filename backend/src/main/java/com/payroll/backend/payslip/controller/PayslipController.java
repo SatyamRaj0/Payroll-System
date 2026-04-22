@@ -17,6 +17,7 @@ public class PayslipController {
 
     @PostMapping("/generate/{payrollRecordId}")
     @Operation(summary = "Generate and store payslip PDF for a payroll record")
+    @SuppressWarnings("null")
     public ResponseEntity<byte[]> generate(@PathVariable Long payrollRecordId) {
         byte[] pdf = payslipService.generateAndStore(payrollRecordId);
         return ResponseEntity.ok()
@@ -28,6 +29,7 @@ public class PayslipController {
 
     @GetMapping("/download")
     @Operation(summary = "Download payslip by employee ID and period")
+    @SuppressWarnings("null")
     public ResponseEntity<byte[]> download(
             @RequestParam Long empId,
             @RequestParam String period) {

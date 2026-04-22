@@ -27,6 +27,7 @@ public class TaxController {
     }
 
     @PostMapping("/slabs")
+    @SuppressWarnings("null")
     public ResponseEntity<ApiResponse<TaxSlab>> addSlab(@RequestBody TaxSlab slab) {
         return ResponseEntity.ok(ApiResponse.ok(taxSlabRepo.save(slab), "Tax slab added"));
     }

@@ -60,6 +60,7 @@ public class DataInitializer implements CommandLineRunner {
         seedYearSlabs("2026-2027");
     }
 
+    @SuppressWarnings("null")
     private void seedYearSlabs(String year) {
         if (taxSlabRepository.existsByFiscalYear(year)) return;
 

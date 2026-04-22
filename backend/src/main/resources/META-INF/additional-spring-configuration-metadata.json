@@ -1,0 +1,19 @@
+{
+  "properties": [
+    {
+      "name": "jwt.secret",
+      "type": "java.lang.String",
+      "description": "JWT signing secret used to generate and validate tokens."
+    },
+    {
+      "name": "jwt.expiry",
+      "type": "java.lang.Long",
+      "description": "JWT access token expiry in milliseconds."
+    },
+    {
+      "name": "jwt.refresh-expiry",
+      "type": "java.lang.Long",
+      "description": "JWT refresh token expiry in milliseconds."
+    }
+  ]
+}
