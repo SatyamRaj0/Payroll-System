@@ -1,0 +1,766 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+--bg:#0F1117;--bg2:#161B27;--bg3:#1E2535;--bg4:#252D40;
+--surface:#1A2033;--surface2:#222B3E;
+--border:#2A3450;--border2:#334060;
+--text:#E8EDF8;--text2:#8A96B0;--text3:#5A6480;
+--accent:#4F8EF7;--accent2:#3D7AE8;--accentglow:#4F8EF740;
+--green:#34D399;--greenbg:#0D2B1F;
+--amber:#FBBF24;--amberbg:#2A1F00;
+--red:#F87171;--redbg:#2B0D0D;
+--purple:#A78BFA;--purplebg:#1A1030;
+--teal:#2DD4BF;
+--font:'DM Sans',sans-serif;
+--mono:'DM Mono',monospace;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;line-height:1.5;overflow-x:hidden;}
+.layout{display:grid;grid-template-columns:220px 1fr;min-height:100vh;}
+.sidebar{background:var(--bg2);border-right:1px solid var(--border);padding:0;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column;}
+.sidebar-logo{padding:20px 20px 16px;border-bottom:1px solid var(--border);}
+.logo-mark{display:flex;align-items:center;gap:10px;}
+.logo-icon{width:34px;height:34px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:600;color:#fff;font-family:var(--mono);}
+.logo-text{font-size:15px;font-weight:600;color:var(--text);}
+.logo-sub{font-size:11px;color:var(--text3);font-family:var(--mono);letter-spacing:.5px;}
+.sidebar-section{padding:16px 12px 8px;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;border-radius:0;color:var(--text2);font-size:13.5px;font-weight:400;transition:all .15s;position:relative;margin:1px 8px;border-radius:8px;}
+.nav-item:hover{background:var(--bg3);color:var(--text);}
+.nav-item.active{background:var(--accentglow);color:var(--accent);font-weight:500;}
+.nav-item.active::before{content:'';position:absolute;left:-8px;top:50%;transform:translateY(-50%);width:3px;height:18px;background:var(--accent);border-radius:2px;}
+.nav-icon{width:16px;height:16px;opacity:.7;flex-shrink:0;}
+.nav-item.active .nav-icon{opacity:1;}
+.nav-badge{margin-left:auto;background:var(--redbg);color:var(--red);font-size:10px;padding:2px 6px;border-radius:20px;font-weight:600;}
+.sidebar-bottom{margin-top:auto;padding:12px;border-top:1px solid var(--border);}
+.user-card{display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg3);border-radius:8px;cursor:pointer;}
+.user-avatar{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--purple));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0;}
+.user-name{font-size:13px;font-weight:500;color:var(--text);}
+.user-role{font-size:11px;color:var(--text3);}
+.main{background:var(--bg);overflow-y:auto;}
+.topbar{display:flex;align-items:center;padding:16px 28px;border-bottom:1px solid var(--border);background:var(--bg2);gap:16px;position:sticky;top:0;z-index:10;}
+.page-title{font-size:18px;font-weight:600;color:var(--text);}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:12px;}
+.search-box{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:13px;color:var(--text2);width:220px;font-family:var(--font);outline:none;}
+.search-box:focus{border-color:var(--accent);color:var(--text);}
+.search-box::placeholder{color:var(--text3);}
+.btn{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;font-family:var(--font);transition:all .15s;}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary:hover{background:var(--accent2);}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border2);}
+.btn-ghost:hover{background:var(--bg3);color:var(--text);}
+.btn-sm{padding:5px 12px;font-size:12px;}
+.content{padding:24px 28px;}
+.page{display:none;}
+.page.active{display:block;}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;}
+.stat-label{font-size:12px;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;}
+.stat-value{font-size:26px;font-weight:600;color:var(--text);font-family:var(--mono);}
+.stat-change{font-size:12px;margin-top:6px;}
+.stat-change.up{color:var(--green);}
+.stat-change.down{color:var(--red);}
+.stat-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;margin-bottom:12px;}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;}
+.row-3{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:24px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.card-title{font-size:14px;font-weight:600;color:var(--text);}
+.card-subtitle{font-size:12px;color:var(--text3);margin-top:2px;}
+.tag{display:inline-flex;align-items:center;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:500;}
+.tag-green{background:var(--greenbg);color:var(--green);}
+.tag-amber{background:var(--amberbg);color:var(--amber);}
+.tag-red{background:var(--redbg);color:var(--red);}
+.tag-blue{background:var(--accentglow);color:var(--accent);}
+.tag-purple{background:var(--purplebg);color:var(--purple);}
+table{width:100%;border-collapse:collapse;}
+th{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;font-weight:500;padding:10px 12px;text-align:left;border-bottom:1px solid var(--border);}
+td{padding:12px;font-size:13px;color:var(--text);border-bottom:1px solid var(--border);}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:var(--bg3);}
+.emp-cell{display:flex;align-items:center;gap:10px;}
+.emp-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;flex-shrink:0;}
+.emp-name{font-size:13px;font-weight:500;}
+.emp-email{font-size:11px;color:var(--text3);}
+.salary-bar{height:6px;background:var(--bg4);border-radius:3px;margin-top:4px;overflow:hidden;}
+.salary-fill{height:100%;border-radius:3px;background:var(--accent);}
+.chart-bars{display:flex;align-items:flex-end;gap:8px;height:120px;padding-bottom:4px;}
+.bar-wrap{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;}
+.bar{background:var(--accent);border-radius:4px 4px 0 0;width:100%;opacity:.85;transition:opacity .2s;}
+.bar:hover{opacity:1;}
+.bar-label{font-size:10px;color:var(--text3);}
+.bar-val{font-size:10px;color:var(--text2);font-family:var(--mono);}
+.donut-wrap{display:flex;align-items:center;gap:20px;}
+.donut-legend{display:flex;flex-direction:column;gap:8px;}
+.legend-item{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);}
+.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.progress-list{display:flex;flex-direction:column;gap:12px;}
+.progress-item{display:flex;flex-direction:column;gap:4px;}
+.progress-header{display:flex;justify-content:space-between;font-size:12px;}
+.progress-label{color:var(--text2);}
+.progress-val{color:var(--text);font-family:var(--mono);}
+.progress-track{height:6px;background:var(--bg4);border-radius:3px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:3px;transition:width .4s;}
+.payslip-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;max-width:600px;margin:0 auto;}
+.payslip-header{background:linear-gradient(135deg,var(--accent2),var(--purple));padding:24px;color:#fff;}
+.payslip-logo{font-size:20px;font-weight:700;margin-bottom:4px;}
+.payslip-sub{font-size:12px;opacity:.7;}
+.payslip-info{display:grid;grid-template-columns:1fr 1fr;gap:20px;padding:20px;border-bottom:1px solid var(--border);}
+.payslip-field{display:flex;flex-direction:column;gap:2px;}
+.field-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;}
+.field-val{font-size:13px;font-weight:500;}
+.payslip-body{padding:20px;}
+.payslip-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);}
+.payslip-row:last-child{border-bottom:none;}
+.payslip-section{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin:16px 0 8px;}
+.payslip-total{display:flex;justify-content:space-between;align-items:center;padding:14px;background:var(--accentglow);border-radius:8px;margin-top:12px;}
+.total-label{font-size:14px;font-weight:600;color:var(--accent);}
+.total-val{font-size:20px;font-weight:700;color:var(--text);font-family:var(--mono);}
+.payroll-engine{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.engine-step{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;position:relative;}
+.engine-step-num{width:24px;height:24px;background:var(--accentglow);color:var(--accent);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;margin-bottom:12px;font-family:var(--mono);}
+.engine-step-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;}
+.engine-step-desc{font-size:12px;color:var(--text3);line-height:1.6;}
+.process-indicator{display:flex;gap:4px;margin-top:10px;}
+.indicator-dot{width:6px;height:6px;border-radius:50%;background:var(--border2);}
+.indicator-dot.done{background:var(--green);}
+.indicator-dot.active{background:var(--accent);}
+.audit-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
+.audit-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.audit-content{flex:1;}
+.audit-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:2px;}
+.audit-meta{font-size:11px;color:var(--text3);}
+.audit-time{font-size:11px;color:var(--text3);margin-left:auto;white-space:nowrap;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.form-field{display:flex;flex-direction:column;gap:6px;}
+.form-label{font-size:12px;color:var(--text2);font-weight:500;}
+.form-input{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:13px;color:var(--text);font-family:var(--font);outline:none;transition:border-color .15s;}
+.form-input:focus{border-color:var(--accent);}
+.form-input::placeholder{color:var(--text3);}
+select.form-input option{background:var(--bg3);}
+.modal-overlay{position:fixed;inset:0;background:#00000088;display:flex;align-items:center;justify-content:center;z-index:100;padding:20px;}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:14px;padding:24px;width:100%;max-width:580px;max-height:85vh;overflow-y:auto;}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.modal-title{font-size:16px;font-weight:600;}
+.modal-close{width:28px;height:28px;border-radius:6px;background:var(--bg3);border:none;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;font-family:var(--font);}
+.modal-close:hover{background:var(--bg4);}
+.modal-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);}
+.notification{position:fixed;bottom:20px;right:20px;background:var(--greenbg);border:1px solid var(--green);color:var(--green);padding:12px 18px;border-radius:10px;font-size:13px;font-weight:500;z-index:200;transform:translateY(80px);opacity:0;transition:all .3s;}
+.notification.show{transform:translateY(0);opacity:1;}
+.tab-row{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:20px;}
+.tab{padding:10px 18px;font-size:13px;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;font-weight:500;transition:all .15s;}
+.tab:hover{color:var(--text2);}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tax-slab{display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg3);border-radius:8px;margin-bottom:8px;}
+.slab-range{font-size:12px;font-family:var(--mono);color:var(--text2);flex:1;}
+.slab-rate{font-size:14px;font-weight:600;color:var(--amber);font-family:var(--mono);}
+.slab-bar{height:6px;background:var(--bg4);border-radius:3px;width:80px;overflow:hidden;}
+.slab-fill{height:100%;border-radius:3px;background:var(--amber);}
+.running-label{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--accent);}
+.pulse{width:8px;height:8px;border-radius:50%;background:var(--accent);}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.5;transform:scale(1.3);}}
+.pulse{animation:pulse 1.5s infinite;}
+.scroll-fade{animation:fadeIn .3s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">
+      <div class="logo-icon">P$</div>
+      <div>
+        <div class="logo-text">PayrollOS</div>
+        <div class="logo-sub">v2.4.0 · ENTERPRISE</div>
+      </div>
+    </div>
+  </div>
+  <div class="sidebar-section">Core</div>
+  <div class="nav-item active" onclick="nav('dashboard')">
+    <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity=".5"/><rect x="1" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".5"/><rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".5"/></svg>
+    Dashboard
+  </div>
+  <div class="nav-item" onclick="nav('employees')">
+    <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M2 14c0-3.314 2.686-6 6-6s6 2.686 6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    Employees
+    <span class="nav-badge">248</span>
+  </div>
+  <div class="nav-item" onclick="nav('payroll')">
+    <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M5 8h6M5 5.5h4M5 10.5h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    Payroll Engine
+  </div>
+  <div class="nav-item" onclick="nav('payslips')">
+    <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M3 2h10v12l-2-1.5L9 14l-2-1.5L5 14l-2-1.5V2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M5.5 6h5M5.5 8.5h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    Payslips
+  </div>
+  <div class="sidebar-section">Finance</div>
+  <div class="nav-item" onclick="nav('tax')">
+    <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M3 13L13 3M9 3h4v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Tax Management
+  </div>
+  <div class="nav-item" onclick="nav('audit')">
+    <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h8M2 12h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    Audit Logs
+  </div>
+  <div class="sidebar-bottom">
+    <div class="user-card">
+      <div class="user-avatar">AS</div>
+      <div>
+        <div class="user-name">Arjun Singh</div>
+        <div class="user-role">Admin · TechCorp India</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<main class="main">
+<!-- DASHBOARD -->
+<div id="page-dashboard" class="page active scroll-fade">
+  <div class="topbar">
+    <div>
+      <div class="page-title">Dashboard</div>
+    </div>
+    <div class="topbar-right">
+      <span class="running-label"><span class="pulse"></span>Payroll running — April 2025</span>
+      <button class="btn btn-ghost btn-sm">Export</button>
+      <button class="btn btn-primary btn-sm" onclick="showModal('run-payroll')">Run Payroll</button>
+    </div>
+  </div>
+  <div class="content">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#1a2a4a"><svg width="18" height="18" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5" r="3" stroke="#4F8EF7" stroke-width="1.5"/><path d="M2 14c0-3.314 2.686-6 6-6s6 2.686 6 6" stroke="#4F8EF7" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <div class="stat-label">Total Employees</div>
+        <div class="stat-value">248</div>
+        <div class="stat-change up">↑ 12 this month</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#0d2b1f"><svg width="18" height="18" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M5 5l3-3 3 3M5 11l3 3 3-3" stroke="#34D399" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="stat-label">Monthly Payroll</div>
+        <div class="stat-value">₹84.2L</div>
+        <div class="stat-change up">↑ 3.2% vs last month</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#2a1f00"><svg width="18" height="18" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="10" rx="1.5" stroke="#FBBF24" stroke-width="1.5"/><path d="M5 7h6M5 10h4" stroke="#FBBF24" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <div class="stat-label">Tax Deducted</div>
+        <div class="stat-value">₹9.1L</div>
+        <div class="stat-change up">↑ 1.8% vs last month</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#1a1030"><svg width="18" height="18" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#A78BFA" stroke-width="1.5"/><path d="M8 5v3l2 2" stroke="#A78BFA" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <div class="stat-label">Next Pay Date</div>
+        <div class="stat-value">Apr 30</div>
+        <div class="stat-change" style="color:var(--text3)">26 days remaining</div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Monthly Payroll Trend</div>
+            <div class="card-subtitle">Last 7 months</div>
+          </div>
+          <span class="tag tag-green">+8.4% YTD</span>
+        </div>
+        <div class="chart-bars" id="trend-chart"></div>
+        <div style="display:flex;gap:8px;margin-top:8px;" id="trend-labels"></div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div><div class="card-title">Dept. Salary Distribution</div></div>
+        </div>
+        <div class="donut-wrap">
+          <svg width="110" height="110" viewBox="0 0 110 110">
+            <circle cx="55" cy="55" r="40" fill="none" stroke="#1E2535" stroke-width="22"/>
+            <circle cx="55" cy="55" r="40" fill="none" stroke="#4F8EF7" stroke-width="22" stroke-dasharray="100.5 150.8" stroke-dashoffset="-12.6" transform="rotate(-90 55 55)"/>
+            <circle cx="55" cy="55" r="40" fill="none" stroke="#A78BFA" stroke-width="22" stroke-dasharray="62.8 188.5" stroke-dashoffset="-113.1" transform="rotate(-90 55 55)"/>
+            <circle cx="55" cy="55" r="40" fill="none" stroke="#34D399" stroke-width="22" stroke-dasharray="47.1 204.2" stroke-dashoffset="-175.9" transform="rotate(-90 55 55)"/>
+            <circle cx="55" cy="55" r="40" fill="none" stroke="#FBBF24" stroke-width="22" stroke-dasharray="31.4 219.9" stroke-dashoffset="-223" transform="rotate(-90 55 55)"/>
+            <text x="55" y="51" text-anchor="middle" fill="#E8EDF8" font-size="12" font-weight="600" font-family="DM Mono">₹84L</text>
+            <text x="55" y="64" text-anchor="middle" fill="#5A6480" font-size="9">total</text>
+          </svg>
+          <div class="donut-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:#4F8EF7"></div>Engineering · 40%</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#A78BFA"></div>Product · 25%</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#34D399"></div>Design · 19%</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#FBBF24"></div>HR & Ops · 16%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row-3">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Recent Payroll Runs</div>
+          <span class="tag tag-blue">Live</span>
+        </div>
+        <table>
+          <thead><tr><th>Month</th><th>Employees</th><th>Gross</th><th>Net</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>Apr 2025</td><td>248</td><td>₹94.3L</td><td>₹84.2L</td><td><span class="tag tag-amber">Processing</span></td></tr>
+            <tr><td>Mar 2025</td><td>244</td><td>₹91.8L</td><td>₹81.5L</td><td><span class="tag tag-green">Completed</span></td></tr>
+            <tr><td>Feb 2025</td><td>240</td><td>₹89.2L</td><td>₹79.1L</td><td><span class="tag tag-green">Completed</span></td></tr>
+            <tr><td>Jan 2025</td><td>238</td><td>₹87.6L</td><td>₹77.8L</td><td><span class="tag tag-green">Completed</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">System Health</div></div>
+        <div class="progress-list">
+          <div class="progress-item">
+            <div class="progress-header"><span class="progress-label">Redis Cache</span><span class="progress-val">94%</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width:94%;background:var(--green)"></div></div>
+          </div>
+          <div class="progress-item">
+            <div class="progress-header"><span class="progress-label">Kafka Broker</span><span class="progress-val">Online</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width:100%;background:var(--green)"></div></div>
+          </div>
+          <div class="progress-item">
+            <div class="progress-header"><span class="progress-label">DB Connections</span><span class="progress-val">67/100</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width:67%;background:var(--accent)"></div></div>
+          </div>
+          <div class="progress-item">
+            <div class="progress-header"><span class="progress-label">Email Queue</span><span class="progress-val">12 pending</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width:12%;background:var(--amber)"></div></div>
+          </div>
+          <div class="progress-item">
+            <div class="progress-header"><span class="progress-label">API Uptime</span><span class="progress-val">99.97%</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width:99.97%;background:var(--green)"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EMPLOYEES -->
+<div id="page-employees" class="page scroll-fade">
+  <div class="topbar">
+    <div class="page-title">Employee Management</div>
+    <div class="topbar-right">
+      <input class="search-box" placeholder="Search employees..." id="emp-search" oninput="filterEmployees()">
+      <button class="btn btn-ghost btn-sm">Filter</button>
+      <button class="btn btn-primary btn-sm" onclick="showModal('add-employee')">+ Add Employee</button>
+    </div>
+  </div>
+  <div class="content">
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-label">Active</div><div class="stat-value" style="color:var(--green)">234</div></div>
+      <div class="stat-card"><div class="stat-label">On Leave</div><div class="stat-value" style="color:var(--amber)">9</div></div>
+      <div class="stat-card"><div class="stat-label">Probation</div><div class="stat-value" style="color:var(--purple)">5</div></div>
+      <div class="stat-card"><div class="stat-label">Avg Salary</div><div class="stat-value">₹1.24L</div></div>
+    </div>
+    <div class="card">
+      <table id="emp-table">
+        <thead><tr><th>Employee</th><th>Department</th><th>Role</th><th>Salary</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="emp-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- PAYROLL ENGINE -->
+<div id="page-payroll" class="page scroll-fade">
+  <div class="topbar">
+    <div class="page-title">Payroll Engine</div>
+    <div class="topbar-right">
+      <button class="btn btn-ghost btn-sm">Schedule</button>
+      <button class="btn btn-primary btn-sm" onclick="runPayrollSim()">▶ Run Simulation</button>
+    </div>
+  </div>
+  <div class="content">
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-header">
+        <div><div class="card-title">Salary Breakdown Calculator</div><div class="card-subtitle">Real-time payroll computation preview</div></div>
+        <select class="form-input btn-sm" id="emp-select" onchange="updateCalc()" style="width:200px">
+          <option>Priya Sharma — ₹1,80,000</option>
+          <option>Rohan Verma — ₹2,40,000</option>
+          <option>Neha Gupta — ₹1,20,000</option>
+          <option>Amit Kumar — ₹3,60,000</option>
+        </select>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px" id="calc-display"></div>
+    </div>
+    <div class="card-title" style="margin-bottom:14px">Processing Pipeline</div>
+    <div class="payroll-engine" id="engine-steps"></div>
+  </div>
+</div>
+
+<!-- PAYSLIPS -->
+<div id="page-payslips" class="page scroll-fade">
+  <div class="topbar">
+    <div class="page-title">Payslip Management</div>
+    <div class="topbar-right">
+      <select class="form-input btn-sm" style="width:160px"><option>April 2025</option><option>March 2025</option><option>Feb 2025</option></select>
+      <button class="btn btn-ghost btn-sm">Bulk Email</button>
+    </div>
+  </div>
+  <div class="content">
+    <div class="tab-row">
+      <div class="tab active" onclick="switchTab(this,'payslip-list')">Employee List</div>
+      <div class="tab" onclick="switchTab(this,'payslip-preview')">Preview Payslip</div>
+    </div>
+    <div id="payslip-list">
+      <div class="card">
+        <table>
+          <thead><tr><th>Employee</th><th>Gross</th><th>Deductions</th><th>Net Pay</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="payslip-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div id="payslip-preview" style="display:none">
+      <div class="payslip-card">
+        <div class="payslip-header">
+          <div class="payslip-logo">TechCorp India Pvt. Ltd.</div>
+          <div class="payslip-sub">Payslip for April 2025</div>
+        </div>
+        <div class="payslip-info">
+          <div class="payslip-field"><div class="field-label">Employee Name</div><div class="field-val">Priya Sharma</div></div>
+          <div class="payslip-field"><div class="field-label">Employee ID</div><div class="field-val">EMP-0042</div></div>
+          <div class="payslip-field"><div class="field-label">Department</div><div class="field-val">Engineering</div></div>
+          <div class="payslip-field"><div class="field-label">Designation</div><div class="field-val">Senior Software Engineer</div></div>
+          <div class="payslip-field"><div class="field-label">PAN Number</div><div class="field-val">ABCPS1234X</div></div>
+          <div class="payslip-field"><div class="field-label">Payment Mode</div><div class="field-val">Bank Transfer · HDFC</div></div>
+        </div>
+        <div class="payslip-body">
+          <div class="payslip-section">Earnings</div>
+          <div class="payslip-row"><span>Basic Salary</span><span style="font-family:var(--mono)">₹90,000</span></div>
+          <div class="payslip-row"><span>HRA</span><span style="font-family:var(--mono)">₹36,000</span></div>
+          <div class="payslip-row"><span>Special Allowance</span><span style="font-family:var(--mono)">₹27,000</span></div>
+          <div class="payslip-row"><span>Performance Bonus</span><span style="font-family:var(--mono)">₹18,000</span></div>
+          <div class="payslip-row" style="font-weight:600"><span>Gross Earnings</span><span style="font-family:var(--mono);color:var(--green)">₹1,71,000</span></div>
+          <div class="payslip-section">Deductions</div>
+          <div class="payslip-row"><span>Provident Fund (12%)</span><span style="font-family:var(--mono);color:var(--red)">-₹10,800</span></div>
+          <div class="payslip-row"><span>Income Tax (TDS)</span><span style="font-family:var(--mono);color:var(--red)">-₹14,400</span></div>
+          <div class="payslip-row"><span>Professional Tax</span><span style="font-family:var(--mono);color:var(--red)">-₹200</span></div>
+          <div class="payslip-row" style="font-weight:600"><span>Total Deductions</span><span style="font-family:var(--mono);color:var(--red)">-₹25,400</span></div>
+          <div class="payslip-total">
+            <span class="total-label">Net Pay</span>
+            <span class="total-val">₹1,45,600</span>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:16px">
+            <button class="btn btn-primary" style="flex:1" onclick="notify('Payslip downloaded as PDF!')">↓ Download PDF</button>
+            <button class="btn btn-ghost" style="flex:1" onclick="notify('Payslip emailed to priya@techcorp.in')">✉ Email</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAX -->
+<div id="page-tax" class="page scroll-fade">
+  <div class="topbar">
+    <div class="page-title">Tax Management</div>
+    <div class="topbar-right">
+      <button class="btn btn-primary btn-sm" onclick="showModal('add-slab')">+ Add Slab</button>
+    </div>
+  </div>
+  <div class="content">
+    <div class="row">
+      <div class="card">
+        <div class="card-header"><div class="card-title">Indian Tax Slabs — FY 2025-26</div><span class="tag tag-green">New Regime</span></div>
+        <div id="tax-slabs"></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Tax Computation</div></div>
+        <div class="form-field" style="margin-bottom:14px">
+          <div class="form-label">Annual Gross Salary (₹)</div>
+          <input class="form-input" type="number" id="tax-input" value="1440000" oninput="computeTax()">
+        </div>
+        <div id="tax-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AUDIT -->
+<div id="page-audit" class="page scroll-fade">
+  <div class="topbar">
+    <div class="page-title">Audit Logs</div>
+    <div class="topbar-right">
+      <input class="search-box" placeholder="Search logs...">
+      <button class="btn btn-ghost btn-sm">Export CSV</button>
+    </div>
+  </div>
+  <div class="content">
+    <div class="card">
+      <div id="audit-log"></div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="modal-run-payroll" style="display:none" onclick="if(event.target===this)closeModal('run-payroll')">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Run Payroll — April 2025</div><button class="modal-close" onclick="closeModal('run-payroll')">×</button></div>
+    <div style="color:var(--text2);font-size:13px;margin-bottom:16px">This will process payroll for 248 employees. Review the summary below.</div>
+    <div style="background:var(--bg3);border-radius:8px;padding:14px;margin-bottom:14px">
+      <div class="payslip-row"><span>Employees</span><span style="font-family:var(--mono)">248</span></div>
+      <div class="payslip-row"><span>Gross Payroll</span><span style="font-family:var(--mono)">₹94,31,200</span></div>
+      <div class="payslip-row"><span>Total Deductions</span><span style="font-family:var(--mono);color:var(--red)">-₹10,08,800</span></div>
+      <div class="payslip-row" style="font-weight:600"><span>Net Payroll</span><span style="font-family:var(--mono);color:var(--green)">₹84,22,400</span></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('run-payroll')">Cancel</button>
+      <button class="btn btn-primary" onclick="closeModal('run-payroll');notify('Payroll processing started for 248 employees!')">Confirm & Run</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-add-employee" style="display:none" onclick="if(event.target===this)closeModal('add-employee')">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Add Employee</div><button class="modal-close" onclick="closeModal('add-employee')">×</button></div>
+    <div class="form-grid">
+      <div class="form-field"><div class="form-label">Full Name</div><input class="form-input" placeholder="Riya Patel"></div>
+      <div class="form-field"><div class="form-label">Email</div><input class="form-input" placeholder="riya@techcorp.in"></div>
+      <div class="form-field"><div class="form-label">Phone</div><input class="form-input" placeholder="+91 98XXXXXXXX"></div>
+      <div class="form-field"><div class="form-label">Department</div><select class="form-input"><option>Engineering</option><option>Product</option><option>Design</option><option>HR & Ops</option></select></div>
+      <div class="form-field"><div class="form-label">Role / Designation</div><input class="form-input" placeholder="Software Engineer"></div>
+      <div class="form-field"><div class="form-label">Basic Salary (₹)</div><input class="form-input" type="number" placeholder="80000"></div>
+      <div class="form-field"><div class="form-label">PAN Number</div><input class="form-input" placeholder="ABCDE1234F"></div>
+      <div class="form-field"><div class="form-label">Bank Account No.</div><input class="form-input" placeholder="XXXXXXXXXXXX"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('add-employee')">Cancel</button>
+      <button class="btn btn-primary" onclick="closeModal('add-employee');notify('Employee added successfully!')">Save Employee</button>
+    </div>
+  </div>
+</div>
+
+<div class="notification" id="notification"></div>
+
+<script>
+const employees=[
+  {name:'Priya Sharma',email:'priya@techcorp.in',dept:'Engineering',role:'Sr. Software Engineer',salary:180000,status:'Active',colors:['#4F8EF7','#1a2a4a']},
+  {name:'Rohan Verma',email:'rohan@techcorp.in',dept:'Product',role:'Product Manager',salary:240000,status:'Active',colors:['#A78BFA','#1a1030']},
+  {name:'Neha Gupta',email:'neha@techcorp.in',dept:'Design',role:'UX Designer',salary:120000,status:'Active',colors:['#34D399','#0d2b1f']},
+  {name:'Amit Kumar',email:'amit@techcorp.in',dept:'Engineering',role:'Tech Lead',salary:360000,status:'Active',colors:['#4F8EF7','#1a2a4a']},
+  {name:'Deepa Nair',email:'deepa@techcorp.in',dept:'HR & Ops',role:'HR Manager',salary:150000,status:'On Leave',colors:['#FBBF24','#2a1f00']},
+  {name:'Kiran Rao',email:'kiran@techcorp.in',dept:'Engineering',role:'DevOps Engineer',salary:200000,status:'Active',colors:['#4F8EF7','#1a2a4a']},
+  {name:'Sonia Mehta',email:'sonia@techcorp.in',dept:'Product',role:'Business Analyst',salary:160000,status:'Probation',colors:['#A78BFA','#1a1030']},
+  {name:'Varun Das',email:'varun@techcorp.in',dept:'Design',role:'UI Designer',salary:110000,status:'Active',colors:['#34D399','#0d2b1f']},
+];
+
+function initials(name){return name.split(' ').map(n=>n[0]).join('');}
+function fmt(n){return '₹'+Math.round(n).toLocaleString('en-IN');}
+
+function renderEmployees(list){
+  const tb=document.getElementById('emp-tbody');
+  tb.innerHTML=list.map(e=>`<tr>
+    <td><div class="emp-cell"><div class="emp-avatar" style="background:${e.colors[1]};color:${e.colors[0]}">${initials(e.name)}</div><div><div class="emp-name">${e.name}</div><div class="emp-email">${e.email}</div></div></div></td>
+    <td>${e.dept}</td>
+    <td style="color:var(--text2)">${e.role}</td>
+    <td>
+      <div style="font-family:var(--mono);font-size:12px">${fmt(e.salary)}/mo</div>
+      <div class="salary-bar"><div class="salary-fill" style="width:${Math.round(e.salary/3600*100)}%"></div></div>
+    </td>
+    <td><span class="tag ${e.status==='Active'?'tag-green':e.status==='On Leave'?'tag-amber':'tag-purple'}">${e.status}</span></td>
+    <td><button class="btn btn-ghost btn-sm" onclick="notify('Viewing ${e.name} profile...')">View</button> <button class="btn btn-ghost btn-sm" onclick="notify('Editing ${e.name}...')">Edit</button></td>
+  </tr>`).join('');
+}
+
+function filterEmployees(){
+  const q=document.getElementById('emp-search').value.toLowerCase();
+  renderEmployees(employees.filter(e=>e.name.toLowerCase().includes(q)||e.dept.toLowerCase().includes(q)||e.role.toLowerCase().includes(q)));
+}
+
+function renderPayslips(){
+  const tb=document.getElementById('payslip-tbody');
+  tb.innerHTML=employees.map(e=>{
+    const gross=Math.round(e.salary*1.2);
+    const ded=Math.round(gross*0.148);
+    const net=gross-ded;
+    return `<tr>
+      <td><div class="emp-cell"><div class="emp-avatar" style="background:${e.colors[1]};color:${e.colors[0]}">${initials(e.name)}</div><div class="emp-name">${e.name}</div></div></td>
+      <td style="font-family:var(--mono)">${fmt(gross)}</td>
+      <td style="font-family:var(--mono);color:var(--red)">-${fmt(ded)}</td>
+      <td style="font-family:var(--mono);color:var(--green)">${fmt(net)}</td>
+      <td><span class="tag ${e.status==='Active'?'tag-green':'tag-amber'}">Generated</span></td>
+      <td><button class="btn btn-ghost btn-sm" onclick="switchTab(document.querySelectorAll('.tab')[1],'payslip-preview');notify('Loading payslip...')">View</button> <button class="btn btn-ghost btn-sm" onclick="notify('PDF downloaded!')">PDF</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderTrend(){
+  const months=['Oct','Nov','Dec','Jan','Feb','Mar','Apr'];
+  const vals=[71,74,78,77,81,82,84];
+  const max=Math.max(...vals);
+  const bc=document.getElementById('trend-chart');
+  const bl=document.getElementById('trend-labels');
+  bc.innerHTML=vals.map((v,i)=>`<div class="bar-wrap"><div class="bar-val" style="font-size:9px;font-family:var(--mono);color:var(--text3)">₹${v}L</div><div class="bar" style="height:${Math.round(v/max*100)}%;${i===6?'background:var(--accent)':'background:var(--border2)'}"></div></div>`).join('');
+  bl.innerHTML=months.map((m,i)=>`<div style="flex:1;text-align:center;font-size:10px;color:${i===6?'var(--accent)':'var(--text3)'}">${m}</div>`).join('');
+}
+
+const calcData=[
+  {gross:216000,basic:90000,hra:36000,allow:27000,bonus:18000,pf:10800,tax:14400,pt:200},
+  {gross:288000,basic:120000,hra:48000,allow:36000,bonus:24000,pf:14400,tax:22000,pt:200},
+  {gross:144000,basic:60000,hra:24000,allow:18000,bonus:12000,pf:7200,tax:8400,pt:200},
+  {gross:432000,basic:180000,hra:72000,allow:54000,bonus:36000,pf:21600,tax:42000,pt:200},
+];
+
+function updateCalc(){
+  const i=document.getElementById('emp-select').selectedIndex;
+  const d=calcData[i];
+  const totalDed=d.pf+d.tax+d.pt;
+  const net=d.gross-totalDed;
+  document.getElementById('calc-display').innerHTML=`
+    <div style="background:var(--bg3);border-radius:10px;padding:14px">
+      <div style="font-size:11px;color:var(--text3);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">Earnings</div>
+      ${[['Basic',d.basic],['HRA',d.hra],['Allowance',d.allow],['Bonus',d.bonus]].map(([l,v])=>`<div class="payslip-row" style="padding:5px 0"><span style="font-size:12px;color:var(--text2)">${l}</span><span style="font-size:12px;font-family:var(--mono)">${fmt(v)}</span></div>`).join('')}
+      <div style="border-top:1px solid var(--border);margin-top:8px;padding-top:8px;font-weight:600;display:flex;justify-content:space-between"><span>Gross</span><span style="font-family:var(--mono);color:var(--green)">${fmt(d.gross)}</span></div>
+    </div>
+    <div style="background:var(--bg3);border-radius:10px;padding:14px">
+      <div style="font-size:11px;color:var(--text3);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">Deductions</div>
+      ${[['PF (12%)',d.pf],['Income Tax',d.tax],['Prof. Tax',d.pt]].map(([l,v])=>`<div class="payslip-row" style="padding:5px 0"><span style="font-size:12px;color:var(--text2)">${l}</span><span style="font-size:12px;font-family:var(--mono);color:var(--red)">-${fmt(v)}</span></div>`).join('')}
+      <div style="border-top:1px solid var(--border);margin-top:8px;padding-top:8px;font-weight:600;display:flex;justify-content:space-between"><span>Total</span><span style="font-family:var(--mono);color:var(--red)">-${fmt(totalDed)}</span></div>
+    </div>
+    <div style="background:var(--accentglow);border:1px solid var(--accent);border-radius:10px;padding:14px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center">
+      <div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Net Pay</div>
+      <div style="font-size:28px;font-weight:700;font-family:var(--mono);color:var(--text)">${fmt(net)}</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:4px">Per month</div>
+    </div>`;
+}
+
+const engineSteps=[
+  {num:'01',title:'Data Validation',desc:'Verify employee records, salary structures, and attendance data. Check for missing fields and flag anomalies.',dots:[true,true,true,true,false]},
+  {num:'02',title:'Gross Calculation',desc:'Compute basic salary, HRA, allowances, and bonuses using configurable rule engine formulas.',dots:[true,true,true,false,false]},
+  {num:'03',title:'Tax Computation',desc:'Apply dynamic Indian tax slabs from DB. Calculate TDS based on annual projected income using the slab engine.',dots:[true,true,false,false,false]},
+  {num:'04',title:'PF & Statutory',desc:'Apply EPF (12% employer + 12% employee), ESI, and professional tax deductions per jurisdiction rules.',dots:[true,true,false,false,false]},
+  {num:'05',title:'Net Salary',desc:'Final net = Gross - All deductions. Validate against minimum wage rules before committing.',dots:[true,false,false,false,false]},
+  {num:'06',title:'Payslip Generation',desc:'Generate PDF payslips, persist to DB, emit Kafka event triggering email service.',dots:[false,false,false,false,false]},
+];
+
+function renderEngine(){
+  document.getElementById('engine-steps').innerHTML=engineSteps.map(s=>`
+    <div class="engine-step">
+      <div class="engine-step-num">${s.num}</div>
+      <div class="engine-step-title">${s.title}</div>
+      <div class="engine-step-desc">${s.desc}</div>
+      <div class="process-indicator">${s.dots.map(d=>`<div class="indicator-dot ${d?'done':''}"></div>`).join('')}</div>
+    </div>`).join('');
+}
+
+function runPayrollSim(){
+  notify('Payroll simulation started — processing 248 employees...');
+  const steps=document.querySelectorAll('.engine-step');
+  let i=0;
+  const interval=setInterval(()=>{
+    if(i<steps.length){
+      const dots=steps[i].querySelectorAll('.indicator-dot');
+      dots.forEach(d=>d.classList.add('done'));
+      i++;
+    } else {
+      clearInterval(interval);
+      notify('Simulation complete! 248 payslips generated.');
+    }
+  },500);
+}
+
+const taxSlabs=[
+  {from:0,to:300000,rate:0},
+  {from:300000,to:600000,rate:5},
+  {from:600000,to:900000,rate:10},
+  {from:900000,to:1200000,rate:15},
+  {from:1200000,to:1500000,rate:20},
+  {from:1500000,to:Infinity,rate:30},
+];
+
+function renderTaxSlabs(){
+  document.getElementById('tax-slabs').innerHTML=taxSlabs.map(s=>`
+    <div class="tax-slab">
+      <div class="slab-range">${s.to===Infinity?`₹${(s.from/100000).toFixed(0)}L+`:`₹${(s.from/100000).toFixed(0)}L – ₹${(s.to/100000).toFixed(0)}L`}</div>
+      <div class="slab-bar"><div class="slab-fill" style="width:${s.rate===0?3:s.rate/30*100}%"></div></div>
+      <div class="slab-rate">${s.rate}%</div>
+    </div>`).join('');
+}
+
+function computeTax(){
+  const gross=parseFloat(document.getElementById('tax-input').value)||0;
+  let tax=0;let remaining=gross;
+  const breakdown=[];
+  for(const s of taxSlabs){
+    const taxable=Math.min(remaining,s.to===Infinity?remaining:s.to-s.from);
+    if(taxable<=0)break;
+    const t=taxable*s.rate/100;
+    breakdown.push({label:s.rate===0?'Nil slab':`${s.rate}% on ₹${Math.round(taxable).toLocaleString('en-IN')}`,amount:t});
+    tax+=t;
+    remaining-=taxable;
+    if(remaining<=0)break;
+  }
+  const cess=tax*0.04;const total=tax+cess;
+  document.getElementById('tax-result').innerHTML=`
+    ${breakdown.map(b=>`<div class="payslip-row"><span style="font-size:12px;color:var(--text2)">${b.label}</span><span style="font-size:12px;font-family:var(--mono)">${fmt(b.amount)}</span></div>`).join('')}
+    <div class="payslip-row"><span style="font-size:12px;color:var(--text2)">Health & Education Cess (4%)</span><span style="font-size:12px;font-family:var(--mono)">${fmt(cess)}</span></div>
+    <div style="background:var(--amberbg);border-radius:8px;padding:12px;margin-top:10px;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:13px;font-weight:600;color:var(--amber)">Total Annual Tax</span>
+      <span style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text)">${fmt(total)}</span>
+    </div>
+    <div style="font-size:11px;color:var(--text3);margin-top:8px">Monthly TDS: ${fmt(total/12)}</div>`;
+}
+
+const auditEvents=[
+  {icon:'💳',bg:'#1a2a4a',color:'#4F8EF7',title:'Payroll processed for March 2025',meta:'244 employees · Initiated by Arjun Singh (Admin)',time:'Today 09:14 AM'},
+  {icon:'✏️',bg:'#0d2b1f',color:'#34D399',title:'Salary updated — Rohan Verma',meta:'CTC changed from ₹2,40,000 → ₹2,88,000 by Sneha Patel (HR)',time:'Yesterday 03:32 PM'},
+  {icon:'👤',bg:'#1a1030',color:'#A78BFA',title:'New employee added — Kiran Rao',meta:'Department: Engineering · Added by Arjun Singh (Admin)',time:'Apr 2, 11:20 AM'},
+  {icon:'🔐',bg:'#2a1f00',color:'#FBBF24',title:'Role permission updated',meta:'HR_MANAGER role: payslip_view granted by Arjun Singh',time:'Apr 1, 04:10 PM'},
+  {icon:'📄',bg:'#0d2b1f',color:'#34D399',title:'Payslips emailed — March 2025',meta:'244 emails sent via Kafka → EmailService',time:'Apr 1, 09:35 AM'},
+  {icon:'⚙️',bg:'#1a2a4a',color:'#4F8EF7',title:'Tax slab configuration updated',meta:'FY 2025-26 new regime slabs applied by Arjun Singh',time:'Mar 31, 06:12 PM'},
+];
+
+function renderAudit(){
+  document.getElementById('audit-log').innerHTML=auditEvents.map(e=>`
+    <div class="audit-item">
+      <div class="audit-icon" style="background:${e.bg};color:${e.color}">${e.icon}</div>
+      <div class="audit-content">
+        <div class="audit-title">${e.title}</div>
+        <div class="audit-meta">${e.meta}</div>
+      </div>
+      <div class="audit-time">${e.time}</div>
+    </div>`).join('');
+}
+
+function nav(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+function showModal(id){document.getElementById('modal-'+id).style.display='flex';}
+function closeModal(id){document.getElementById('modal-'+id).style.display='none';}
+
+function switchTab(el,show){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('payslip-list').style.display=show==='payslip-list'?'block':'none';
+  document.getElementById('payslip-preview').style.display=show==='payslip-preview'?'block':'none';
+}
+
+let notifTimer;
+function notify(msg){
+  const n=document.getElementById('notification');
+  n.textContent=msg;n.classList.add('show');
+  clearTimeout(notifTimer);
+  notifTimer=setTimeout(()=>n.classList.remove('show'),3000);
+}
+
+renderEmployees(employees);
+renderPayslips();
+renderTrend();
+renderEngine();
+updateCalc();
+renderTaxSlabs();
+computeTax();
+renderAudit();
+</script>
+</body>
+</html>
