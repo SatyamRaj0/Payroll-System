@@ -1,5 +1,6 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
+import { useEffect, useState } from 'react'
 import useAuthStore from '../store/authStore'
 import api from '../api/axios'
 
@@ -85,6 +86,12 @@ function initials(name) {
 export default function Layout() {
   const { user, logout } = useAuthStore()
   const navigate = useNavigate()
+  const [theme, setTheme] = useState(() => localStorage.getItem('ui-theme') || 'light')
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+    localStorage.setItem('ui-theme', theme)
+  }, [theme])
 
   const { data: empData } = useQuery({
     queryKey: ['employeeCount'],
@@ -97,6 +104,10 @@ export default function Layout() {
   function handleLogout() {
     logout()
     navigate('/login')
+  }
+
+  function toggleTheme() {
+    setTheme(current => (current === 'light' ? 'dark' : 'light'))
   }
 
   const displayName = user?.email?.split('@')[0] || 'Admin'
@@ -183,6 +194,23 @@ export default function Layout() {
 
         {/* Bottom user card */}
         <div style={{ padding: 12, borderTop: '1px solid var(--border)' }}>
+          <button
+            onClick={toggleTheme}
+            style={{
+              width: '100%',
+              marginBottom: 10,
+              border: '1px solid var(--border2)',
+              background: 'var(--surface)',
+              color: 'var(--text2)',
+              padding: '9px 10px',
+              borderRadius: 8,
+              fontSize: 12,
+              fontWeight: 600,
+              cursor: 'pointer',
+            }}
+          >
+            {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
+          </button>
           <div style={{
             display: 'flex', alignItems: 'center', gap: 10, padding: 10,
             background: 'var(--bg3)', borderRadius: 8, cursor: 'pointer',
